@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##         Script de sauvegarde et restauration wordpresss         ##
+##     Script de sauvegarde et restauration wordpresss  V0.12      ##
 ##                                                                 ##
 #####################################################################
 
@@ -17,6 +17,12 @@ BACKUPDATE=$(date +%Y-%m-%d)
 ############################## SSH ##################################
 
 
+
+#################### Emplacement des programmes #####################
+
+TAR="/bin/tar"
+SCP="/usr/bin/scp"
+SSH="/usr/bin/ssh"
 
 #################### Fichier de configuration #######################
 
