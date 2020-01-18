@@ -6,7 +6,10 @@ if [[ $# -eq 0 ]] ; then
     exit 1
 fi
 
-if [ $1 = save ] ; then
+if [ $1 = 'rest' ] || [ $1 = 'save' ]
+ then
+ 
+    if [ $1 = save ] ; then
 	    echo "Sauvegarde en cours ..."
 
 
@@ -19,4 +22,10 @@ if [ $1 = save ] ; then
 
 
 
+    fi
+
+
+ else 
+        echo "Mauvais argument !"
 fi
+
