@@ -1,10 +1,21 @@
 #!/bin/bash
+
+#####################################################################
+##                                                                 ##
+##         Script de sauvegarde et restauration wordpresss         ##
+##                                                                 ##
+#####################################################################
+
+
 ########################## les variables ############################
 
 SERVEUR_FTP='192.168.0.2'
 BACKUP='/home/backup'
 BACKUPDATE=$(date +%Y-%m-%d)
 [ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
+
+############################## SSH ##################################
+
 
 
 #################### Fichier de configuration #######################
