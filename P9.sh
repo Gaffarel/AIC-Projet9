@@ -51,13 +51,14 @@ if [ "$1" = "save" ] ; then
     tar cvpjf save_res.tar.bz2 etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname
     echo "  Sauvegarde de la BDD MariaDB ..."
     #docker exec 840 /usr/bin/mysqldump -u allouis --password=bob MyCompany > db.sql
-    echo "   Sauvegarde des paramètres du réseau ..."
+    echo "   Sauvegarde des Volumes Docker ..."
 
 ########################### Restauration ############################
 
 elif [ "$1" = "rest" ] ; then
 
 echo "Procédure de récupération en cours ..."
+
 ########################### Docker Engine ###########################
 echo " Préparation à l'installation de docker ..."
 apt-get update
