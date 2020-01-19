@@ -12,7 +12,7 @@
 SERVEUR_FTP='192.168.0.2'
 BACKUP='/home/backup'
 BACKUPDATE=$(date +%Y-%m-%d)
-[ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
+#[ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
 
 ############################## SSH ##################################
 
@@ -53,7 +53,7 @@ if [ "$1" = "save" ] ; then
     #docker exec 840 /usr/bin/mysqldump -u allouis --password=bob MyCompany > db.sql
     echo "   Sauvegarde des paramètres du réseau ..."
 
-#####################################################################
+########################### Restauration ############################
 
 elif [ "$1" = "rest" ] ; then
 
@@ -78,8 +78,6 @@ apt-get update
 echo " Installation de docker-Engine ..."
 apt-get install -y docker-ce docker-ce-cli containerd.io
 
-#docker run hello-world
-
 ########################## DOCKER-COMPOSE ###########################
 echo " Installation de docker-Compose ..."
 curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -87,6 +85,11 @@ curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compo
 chmod +x /usr/local/bin/docker-compose
 
 docker-compose --version
+
+###################### Restauration de la BDD #######################
+
+echo "  Restauration de la BDD MariaDB ..."
+#cat db.sql | docker exec -i 840 /usr/bin/mysql -u allouis --password=bob MyCompany
 
 
 fi
