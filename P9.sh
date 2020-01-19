@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.12      ##
+##     Script de sauvegarde et restauration wordpresss  V0.12a     ##
 ##                                                                 ##
 #####################################################################
 
@@ -45,9 +45,10 @@ fi
 ############################ Sauvegarde #############################
 
 if [ "$1" = "save" ] ; then
+
 	echo "Sauvegarde en cours ..."
     echo " Sauvegarde des paramètres du réseau ..."
-    tar cvpjf save_res.tar.bz2 etc/network/interface etc/resolv.conf etc/hosts etc/hostname
+    tar cvpjf save_res.tar.bz2 etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname
     echo "  Sauvegarde de la BDD MariaDB ..."
     #docker exec 840 /usr/bin/mysqldump -u allouis --password=bob MyCompany > db.sql
     echo "   Sauvegarde des paramètres du réseau ..."
@@ -55,7 +56,38 @@ if [ "$1" = "save" ] ; then
 #####################################################################
 
 elif [ "$1" = "rest" ] ; then
+
 echo "Procédure de récupération en cours ..."
+########################### Docker Engine ###########################
+echo " Préparation à l'installation de docker ..."
+apt-get update
+apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg2 \
+    software-properties-common
+curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+apt-key fingerprint 0EBFCD88
+add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) \
+   stable"
+
+apt-get update
+echo " Installation de docker-Engine ..."
+apt-get install -y docker-ce docker-ce-cli containerd.io
+
+#docker run hello-world
+
+########################## DOCKER-COMPOSE ###########################
+echo " Installation de docker-Compose ..."
+curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+chmod +x /usr/local/bin/docker-compose
+
+docker-compose --version
+
 
 fi
 
