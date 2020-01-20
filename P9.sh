@@ -2,16 +2,17 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.12d     ##
+##     Script de sauvegarde et restauration wordpresss  V0.12e     ##
 ##                                                                 ##
 #####################################################################
 
 
 #################### Emplacement des programmes #####################
 
-DOCKER="/bin/usr/docker"
-TAR="/bin/tar"
+DOCKER="/usr/bin/docker"
+TAR="/usr/bin/tar"
 SCP="/usr/bin/scp"
+FTP="/usr/bin/ftp"
 #SSH="/usr/bin/ssh"
 
 ########################## les variables ############################
@@ -66,11 +67,16 @@ fi
 if [ "$1" = "save" ] ; then
     CONTAINER
 	echo "Sauvegarde en cours ..."
-    echo " Sauvegarde des paramètres du réseau ..."
-    tar cvpjf save_res.tar.bz2 etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname
-    echo "  Sauvegarde de la BDD MariaDB ..."
+    echo " Sauvegarde de la BDD MariaDB ...";
+    sleep 2
     $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u allouis --password=bob MyCompany > db.sql
-    echo "   Sauvegarde des Volumes Docker ..."
+    echo "  Sauvegarde des Volumes Docker ...";
+    sleep 2
+    $TAR cvpjf save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/
+    echo "   Sauvegarde des paramètres du réseau ...";
+    sleep 2
+    $TAR rf save_$BACKUPDATE.tar.bz2 etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname
+
 
 ########################### Restauration ############################
 
