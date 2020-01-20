@@ -2,10 +2,17 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.12a     ##
+##     Script de sauvegarde et restauration wordpresss  V0.12d     ##
 ##                                                                 ##
 #####################################################################
 
+
+#################### Emplacement des programmes #####################
+
+DOCKER="/bin/usr/docker"
+TAR="/bin/tar"
+SCP="/usr/bin/scp"
+#SSH="/usr/bin/ssh"
 
 ########################## les variables ############################
 
@@ -13,16 +20,28 @@ SERVEUR_FTP='192.168.0.2'
 BACKUP='/home/backup'
 BACKUPDATE=$(date +%Y-%m-%d)
 #[ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
+contenaire_wordpress=''
+contenaire_mariadb=''
 
 ############################## SSH ##################################
 
 
 
-#################### Emplacement des programmes #####################
+########################### LES FONCTIONS ###########################
 
-TAR="/bin/tar"
-SCP="/usr/bin/scp"
-SSH="/usr/bin/ssh"
+##################### FONCTION N° de Contenaire #####################
+function CONTAINER
+{
+info=$($DOCKER ps | awk 'NR==2{print$1,$2}')
+if [[ $info =~ wordpress ]] ; then
+    contenaire_wordpress=$($DOCKER ps | awk 'NR==2{print$1}')
+    contenaire_mariadb=$($DOCKER ps | awk 'NR==3{print$1}')
+elif
+    [[ $info =~ mariadb ]] ; then
+    contenaire_wordpress=$($DOCKER ps | awk 'NR==3{print$1}')
+    contenaire_mariadb=$($DOCKER ps | awk 'NR==2{print$1}')
+fi
+}
 
 #################### Fichier de configuration #######################
 
@@ -45,12 +64,12 @@ fi
 ############################ Sauvegarde #############################
 
 if [ "$1" = "save" ] ; then
-
+    CONTAINER
 	echo "Sauvegarde en cours ..."
     echo " Sauvegarde des paramètres du réseau ..."
     tar cvpjf save_res.tar.bz2 etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname
     echo "  Sauvegarde de la BDD MariaDB ..."
-    #docker exec 840 /usr/bin/mysqldump -u allouis --password=bob MyCompany > db.sql
+    $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u allouis --password=bob MyCompany > db.sql
     echo "   Sauvegarde des Volumes Docker ..."
 
 ########################### Restauration ############################
