@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.14a     ##
+##     Script de sauvegarde et restauration wordpresss  V0.15      ##
 ##                                                                 ##
 #####################################################################
 
@@ -113,6 +113,7 @@ if [ "$1" = "save" ] ; then
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
     cd /
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ home/backup/log/ home/backup/docker-compose.yml home/backup/db_$BACKUPDATE.sql
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     save_ftp
