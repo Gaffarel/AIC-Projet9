@@ -10,17 +10,18 @@
 #################### Emplacement des programmes #####################
 
 DOCKER="/usr/bin/docker"
+DOCKER_COMPOSE="/usr/local/bin/docker-compose"
 TAR="/usr/bin/tar"
-SCP="/usr/bin/scp"
 FTP="/usr/bin/ftp"
 #SSH="/usr/bin/ssh"
+#SCP="/usr/bin/scp"
 
 ########################## les variables ############################
 
 SERVEUR_FTP='192.168.0.2'
 BACKUP='/home/backup'
 BACKUPDATE=$(date +%Y-%m-%d)
-#[ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
+[ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
 contenaire_wordpress=''
 contenaire_mariadb=''
 
@@ -43,6 +44,30 @@ elif
     contenaire_mariadb=$($DOCKER ps | awk 'NR==2{print$1}')
 fi
 }
+
+function Transfert_ftp
+{
+    SITFTP="192.168.0.2"
+    USAFTP="allouis"
+    MPSFTP="bob"
+    PRTFTP=21
+#   source fichierSource.cnf
+#   cd $BACKUP
+   ftp -i -n $SITFTP $PRTFTP <<FTP_CONNEX
+     quote USER $USAFTP
+     quote PASS $MPSFTP
+     bin
+     cd sauvegarde
+     put save_$BACKUPDATE.tar.bz2
+#    put $2
+     quit
+FTP_CONNEX
+}
+
+# #Appel du script
+#   FUNC=$(declare -f Televerse)
+#   sudo bash -c "$FUNC; Televerse $variable1 $variable2"
+
 
 #################### Fichier de configuration #######################
 
@@ -69,10 +94,13 @@ if [ "$1" = "save" ] ; then
 	echo "Sauvegarde en cours ..."
     echo " Sauvegarde de la BDD MariaDB ...";
     sleep 2
+    cd $BACKUP
     $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u allouis --password=bob MyCompany > db.sql
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
-    $TAR cvpjf save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname
+    cd /
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ tmp/testlog/
+    Transfert_ftp
 
 ########################### Restauration ############################
 
@@ -108,11 +136,15 @@ chmod +x /usr/local/bin/docker-compose
 
 docker-compose --version
 
-###################### Restauration de la BDD #######################
+#### Restauration des Volumes Docker et des paramètres du réseau ####
 
+CONTAINER
 echo "  Restauration de la BDD MariaDB ..."
 #cat db.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u allouis --password=bob MyCompany
 
+########## Restauration des fichier docker et de la BDD ############
+
+echo "Restauration des Volumes Docker et des paramètres du réseau ......";
 
 fi
 
