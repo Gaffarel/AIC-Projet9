@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.13a     ##
+##     Script de sauvegarde et restauration wordpresss  V0.14      ##
 ##                                                                 ##
 #####################################################################
 
@@ -113,7 +113,7 @@ if [ "$1" = "save" ] ; then
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
     cd /
-    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ tmp/testlog/ home/backup/docker-compose.yml home/backup/db_$BACKUPDATE.sql
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ hone/backup/log/ home/backup/docker-compose.yml home/backup/db_$BACKUPDATE.sql
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     save_ftp
@@ -158,6 +158,7 @@ sleep 5
 cd $BACKUP
 
 DOCKER_COMPOSE up -d
+DOCKER_COMPOSE stop
 
 #### Restauration des Volumes Docker et des paramètres du réseau ####
 
@@ -169,5 +170,8 @@ cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u al
 
 echo "Restauration des Volumes Docker et des paramètres du réseau ......";
 tar xvpjf save_$BACKUPDATE.tar.bz2 -C /
+
+DOCKER_COMPOSE start
+
 fi
 
