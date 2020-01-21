@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.15      ##
+##     Script de sauvegarde et restauration wordpresss  V0.15a     ##
 ##                                                                 ##
 #####################################################################
 
@@ -117,6 +117,9 @@ if [ "$1" = "save" ] ; then
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     save_ftp
+
+    rm -f db_$BACKUPDATE.sql
+    rm -f save_$BACKUPDATE.tar.bz2
 
 ########################### Restauration ############################
 
