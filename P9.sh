@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.12g     ##
+##     Script de sauvegarde et restauration wordpresss  V0.13      ##
 ##                                                                 ##
 #####################################################################
 
@@ -58,6 +58,8 @@ cd $BACKUP
      bin
      cd sauvegarde
      put save_$BACKUPDATE.tar.bz2
+     put docker-compose.yml
+#     put db_$BACKUPDATE.sql
      quit
 FTP_CONNEX
 }
@@ -93,11 +95,11 @@ if [ "$1" = "save" ] ; then
     echo " Sauvegarde de la BDD MariaDB ...";
     sleep 2
     cd $BACKUP
-    $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u allouis --password=bob MyCompany > db.sql
+    $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u allouis --password=bob MyCompany > db_$BACKUPDATE.sql
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
     cd /
-    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ tmp/testlog/ $BACKUP/docker-compose.yml $BACKUP/db.sql
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ tmp/testlog/ $BACKUP/docker-compose.yml $BACKUP/db_$BACKUPDATE.sql
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     Transfert_ftp
