@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.13      ##
+##     Script de sauvegarde et restauration wordpresss  V0.13a     ##
 ##                                                                 ##
 #####################################################################
 
@@ -15,6 +15,10 @@ TAR="/usr/bin/tar"
 FTP="/usr/bin/ftp"
 #SSH="/usr/bin/ssh"
 #SCP="/usr/bin/scp"
+
+#################### Fichier de configuration #######################
+
+#source = P9_config.ini
 
 ########################## les variables ############################
 
@@ -48,7 +52,9 @@ elif
 fi
 }
 
-function Transfert_ftp
+########################### FONCTION FTP ############################
+
+function save_ftp
 {
 cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
@@ -59,19 +65,27 @@ cd $BACKUP
      cd sauvegarde
      put save_$BACKUPDATE.tar.bz2
      put docker-compose.yml
-#     put db_$BACKUPDATE.sql
      quit
 FTP_CONNEX
 }
 
-# #Appel du script
-#   FUNC=$(declare -f Televerse)
-#   sudo bash -c "$FUNC; Televerse $variable1 $variable2"
-
-
-#################### Fichier de configuration #######################
-
-#source = P9_config.ini
+function rest_ftp
+{
+cd $BACKUP
+   ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
+     quote USER $USER_FTP
+     quote PASS $MDP_FTP
+     pwd
+     bin
+     cd Projet9/AIC-Projet9
+     get P9.sh
+     cd /
+     cd sauvegarde
+     get save_$BACKUPDATE.tar.bz2
+     get docker-compose.yml
+     quit
+FTP_CONNEX
+}
 
 ####################### Test argument null ##########################
 
@@ -99,10 +113,10 @@ if [ "$1" = "save" ] ; then
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
     cd /
-    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ tmp/testlog/ $BACKUP/docker-compose.yml $BACKUP/db_$BACKUPDATE.sql
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ tmp/testlog/ home/backup/docker-compose.yml home/backup/db_$BACKUPDATE.sql
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
-    Transfert_ftp
+    save_ftp
 
 ########################### Restauration ############################
 
@@ -137,16 +151,23 @@ curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compo
 chmod +x /usr/local/bin/docker-compose
 
 docker-compose --version
+sleep 5
+
+################### Restauration des Images Docker ##################
+
+cd $BACKUP
+
+DOCKER_COMPOSE up -d
 
 #### Restauration des Volumes Docker et des paramètres du réseau ####
 
 CONTAINER
 echo "  Restauration de la BDD MariaDB ..."
-#cat db.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u allouis --password=bob MyCompany
+cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u allouis --password=bob MyCompany
 
 ########## Restauration des fichier docker et de la BDD ############
 
 echo "Restauration des Volumes Docker et des paramètres du réseau ......";
-
+tar xvpjf save_$BACKUPDATE.tar.bz2 -C /
 fi
 
