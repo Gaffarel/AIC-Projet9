@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.12f     ##
+##     Script de sauvegarde et restauration wordpresss  V0.12g     ##
 ##                                                                 ##
 #####################################################################
 
@@ -18,7 +18,10 @@ FTP="/usr/bin/ftp"
 
 ########################## les variables ############################
 
-SERVEUR_FTP='192.168.0.2'
+SERVEUR_FTP="192.168.0.2"
+USER_FTP="allouis"
+MDP_FTP="bob"
+PORT_FTP=21
 BACKUP='/home/backup'
 BACKUPDATE=$(date +%Y-%m-%d)
 [ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
@@ -47,19 +50,14 @@ fi
 
 function Transfert_ftp
 {
-    SITFTP="192.168.0.2"
-    USAFTP="allouis"
-    MPSFTP="bob"
-    PRTFTP=21
-#   source fichierSource.cnf
-#   cd $BACKUP
-   ftp -i -n $SITFTP $PRTFTP <<FTP_CONNEX
-     quote USER $USAFTP
-     quote PASS $MPSFTP
+cd $BACKUP
+   ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
+     quote USER $USER_FTP
+     quote PASS $MDP_FTP
+     pwd
      bin
      cd sauvegarde
      put save_$BACKUPDATE.tar.bz2
-#    put $2
      quit
 FTP_CONNEX
 }
@@ -99,7 +97,9 @@ if [ "$1" = "save" ] ; then
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
     cd /
-    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ tmp/testlog/
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ tmp/testlog/ $BACKUP/docker-compose.yml $BACKUP/db.sql
+    echo "   Transfert vers le serveur FTP ...";
+    sleep 2
     Transfert_ftp
 
 ########################### Restauration ############################
