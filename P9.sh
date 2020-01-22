@@ -18,7 +18,7 @@ FTP="/usr/bin/ftp"
 
 #################### Fichier de configuration #######################
 
-source = $BACKUP/P9_config.ini
+source P9_config.ini
 
 ########################## les variables ############################
 
