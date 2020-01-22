@@ -28,15 +28,11 @@ source P9_config.ini
 # USER_BDD="allouis"
 # MDP_BDD="bob"
 # PORT_FTP=21
-BACKUP='/home/backup'
+#BACKUP='/home/backup'
 BACKUPDATE=$(date +%Y-%m-%d)
 [ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
 contenaire_wordpress=''
 contenaire_mariadb=''
-
-############################## SSH ##################################
-
-
 
 ########################### LES FONCTIONS ###########################
 
