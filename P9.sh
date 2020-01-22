@@ -18,14 +18,16 @@ FTP="/usr/bin/ftp"
 
 #################### Fichier de configuration #######################
 
-#source = P9_config.ini
+source = P9_config.ini
 
 ########################## les variables ############################
 
-SERVEUR_FTP="192.168.0.2"
-USER_FTP="allouis"
-MDP_FTP="bob"
-PORT_FTP=21
+# SERVEUR_FTP="192.168.0.2"
+# USER_FTP="allouis"
+# MDP_FTP="bob"
+# USER_BDD="allouis"
+# MDP_BDD="bob"
+# PORT_FTP=21
 BACKUP='/home/backup'
 BACKUPDATE=$(date +%Y-%m-%d)
 [ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
@@ -104,7 +106,7 @@ if [ "$1" = "save" ] ; then
     echo " Sauvegarde de la BDD MariaDB ...";
     sleep 2
     cd $BACKUP
-    $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u allouis --password=bob MyCompany > db_$BACKUPDATE.sql
+    $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > db_$BACKUPDATE.sql
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
     cd /
