@@ -60,7 +60,6 @@ cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
-     pwd
      bin
      cd sauvegarde
      put save_$BACKUPDATE.tar.bz2
@@ -75,11 +74,7 @@ cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
-     pwd
      bin
-     cd Projet9/AIC-Projet9
-     get P9.sh
-     cd /
      cd sauvegarde
      get save_$BACKUPDATE.tar.bz2
      get docker-compose.yml
@@ -160,8 +155,9 @@ sleep 5
 
 cd $BACKUP
 
+rest_ftp
+
 DOCKER_COMPOSE up -d
-DOCKER_COMPOSE stop
 
 #### Restauration des Volumes Docker et des paramètres du réseau ####
 
@@ -173,8 +169,6 @@ cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u al
 
 echo "Restauration des Volumes Docker et des paramètres du réseau ......";
 tar xvpjf save_$BACKUPDATE.tar.bz2 -C /
-
-DOCKER_COMPOSE start
 
 fi
 
