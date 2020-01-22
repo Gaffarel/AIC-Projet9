@@ -13,8 +13,6 @@ DOCKER="/usr/bin/docker"
 DOCKER_COMPOSE="/usr/local/bin/docker-compose"
 TAR="/usr/bin/tar"
 FTP="/usr/bin/ftp"
-#SSH="/usr/bin/ssh"
-#SCP="/usr/bin/scp"
 
 #################### Fichier de configuration #######################
 
@@ -22,13 +20,6 @@ source P9_config.ini
 
 ########################## les variables ############################
 
-# SERVEUR_FTP="192.168.0.2"
-# USER_FTP="allouis"
-# MDP_FTP="bob"
-# USER_BDD="allouis"
-# MDP_BDD="bob"
-# PORT_FTP=21
-#BACKUP='/home/backup'
 BACKUPDATE=$(date +%Y-%m-%d)
 [ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
 contenaire_wordpress=''
@@ -161,7 +152,7 @@ DOCKER_COMPOSE up -d
 
 CONTAINER
 echo "  Restauration de la BDD MariaDB ..."
-cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u allouis --password=bob MyCompany
+cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
 
 ########## Restauration des fichier docker et de la BDD ############
 
