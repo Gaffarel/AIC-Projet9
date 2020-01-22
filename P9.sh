@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.15a     ##
+##     Script de sauvegarde et restauration wordpresss  V0.16      ##
 ##                                                                 ##
 #####################################################################
 
@@ -18,7 +18,7 @@ FTP="/usr/bin/ftp"
 
 #################### Fichier de configuration #######################
 
-source = P9_config.ini
+source = $BACKUP/P9_config.ini
 
 ########################## les variables ############################
 
