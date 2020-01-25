@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.21      ##
+##     Script de sauvegarde et restauration wordpresss  V0.21a     ##
 ##                                                                 ##
 #####################################################################
 
@@ -45,10 +45,6 @@ fi
 
 function save_ftp
 {
-cd /
-pwd
-cd $BACKUP
-pwd
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
@@ -64,10 +60,6 @@ FTP_CONNEX
 
 function rest_ftp
 {
-cd /
-pwd
-cd $BACKUP
-pwd
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
@@ -174,18 +166,14 @@ elif [ "$1" = "rest" ] ; then
 
 ################### Restauration des Images Docker ##################
 
-cd /
-pwd
-cd $BACKUP
-pwd
 rest_ftp
 docker-compose up -d
-
+sleep 2
 #### Restauration des Volumes Wordpress et des paramètres du réseau ####
 
 echo "Restauration des Volumes Docker et des paramètres du réseau ......";
 tar xvpjf save_$BACKUPDATE.tar.bz2 -C /
-
+sleep 2
 ################## Restauration de la BDD MariaDB ###################
 
 CONTAINER
