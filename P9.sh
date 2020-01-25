@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.20a     ##
+##     Script de sauvegarde et restauration wordpresss  V0.21      ##
 ##                                                                 ##
 #####################################################################
 
@@ -127,7 +127,7 @@ if [ "$1" = "save" ] ; then
     rm -f save_$BACKUPDATE.tar.bz2
 
 #####################################################################
-################## Installation de DOCKER & FTP #####################
+##################### Installation de DOCKER ########################
 #####################################################################
 
 elif [ "$1" = "docker" ] ; then
@@ -165,9 +165,6 @@ chmod +x /usr/local/bin/docker-compose
 
 docker-compose --version
 sleep 5
-####################### Installation de FTP #########################
-
-apt-get install ftp
 
 #####################################################################
 ########################### Restauration ############################
@@ -184,17 +181,16 @@ pwd
 rest_ftp
 docker-compose up -d
 
+#### Restauration des Volumes Wordpress et des paramètres du réseau ####
+
+echo "Restauration des Volumes Docker et des paramètres du réseau ......";
+tar xvpjf save_$BACKUPDATE.tar.bz2 -C /
+
 ################## Restauration de la BDD MariaDB ###################
 
 CONTAINER
 echo "Restauration de la BDD MariaDB ..."
 cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
-
-
-#### Restauration des Volumes Wordpress et des paramètres du réseau ####
-
-echo "Restauration des Volumes Docker et des paramètres du réseau ......";
-tar xvpjf save_$BACKUPDATE.tar.bz2 -C /
 
 fi
 
