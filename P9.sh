@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.16      ##
+##     Script de sauvegarde et restauration wordpresss  V0.17      ##
 ##                                                                 ##
 #####################################################################
 
@@ -21,6 +21,7 @@ source P9_config.ini
 ########################## les variables ############################
 
 BACKUPDATE=$(date +%Y-%m-%d)
+BACKUPDATE_OLD=$(date +%Y-%m-%d --date="$NBjour days ago")
 [ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
 contenaire_wordpress=''
 contenaire_mariadb=''
@@ -51,6 +52,7 @@ cd $BACKUP
      quote PASS $MDP_FTP
      bin
      cd sauvegarde
+     delete save_$BACKUPDATE_OLD.tar.bz2
      put save_$BACKUPDATE.tar.bz2
      put docker-compose.yml
      quit
@@ -67,6 +69,8 @@ cd $BACKUP
      cd sauvegarde
      get save_$BACKUPDATE.tar.bz2
      get docker-compose.yml
+     get .env
+     get P9_config.ini
      quit
 FTP_CONNEX
 }
