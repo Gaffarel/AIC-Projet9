@@ -1,0 +1,36 @@
+version: "3.1"
+services:
+  wordpress:
+    image: wordpress:5.3.2
+    ports:
+      - 80:80
+    env_file: .env
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER=${WP_DB_USER}
+      - WORDPRESS_DB_PASSWORD=${WP_DB_PASSWORD}
+      - WORDPRESS_DB_NAME=${WP_DB_NAME}
+    networks:
+      - mycompanynet
+    volumes:
+      - wp:/var/www/html
+      - /home/backup/log:/var/log
+    restart: always
+  db:
+    image: mariadb:10.3.18
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    networks:
+      - mycompanynet
+    volumes:
+      - db:/var/lib/mysql
+    restart: always
+volumes:
+  db:
+  wp:
+networks:
+  mycompanynet:
