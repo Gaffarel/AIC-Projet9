@@ -60,7 +60,7 @@ FTP_CONNEX
 }
 
 function rest_ftp
-{^
+{
 cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
