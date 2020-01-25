@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.17      ##
+##     Script de sauvegarde et restauration wordpresss  V0.18      ##
 ##                                                                 ##
 #####################################################################
 
@@ -55,6 +55,7 @@ cd $BACKUP
      delete save_$BACKUPDATE_OLD.tar.bz2
      put save_$BACKUPDATE.tar.bz2
      put docker-compose.yml
+     ls save_*.tar.bz2 save_liste.txt
      quit
 FTP_CONNEX
 }
