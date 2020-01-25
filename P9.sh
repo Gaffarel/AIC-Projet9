@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.20      ##
+##     Script de sauvegarde et restauration wordpresss  V0.20a     ##
 ##                                                                 ##
 #####################################################################
 
@@ -10,7 +10,6 @@
 #################### Emplacement des programmes #####################
 
 DOCKER="/usr/bin/docker"
-DOCKER_COMPOSE="/usr/local/bin/docker-compose"
 TAR="/usr/bin/tar"
 FTP="/usr/bin/ftp"
 
@@ -47,7 +46,9 @@ fi
 function save_ftp
 {
 cd /
+pwd
 cd $BACKUP
+pwd
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
@@ -64,7 +65,9 @@ FTP_CONNEX
 function rest_ftp
 {
 cd /
+pwd
 cd $BACKUP
+pwd
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
@@ -99,33 +102,38 @@ if  [ "$1" != "rest" ] && [ "$1" != "save" ] && [ "$1" != "docker" ] ; then
     exit 1
 fi
 
+#####################################################################
 ############################ Sauvegarde #############################
+#####################################################################
 
 if [ "$1" = "save" ] ; then
     CONTAINER
 	echo "Sauvegarde en cours ..."
     echo " Sauvegarde de la BDD MariaDB ...";
     sleep 2
+    pwd
     cd $BACKUP
+    pwd
     $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > db_$BACKUPDATE.sql
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
     cd /
+    pwd
     $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/backup_wp/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ home/backup/log/ home/backup/docker-compose.yml home/backup/db_$BACKUPDATE.sql
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     save_ftp
-
     rm -f db_$BACKUPDATE.sql
     rm -f save_$BACKUPDATE.tar.bz2
 
-########################### Restauration ############################
+#####################################################################
+################## Installation de DOCKER & FTP #####################
+#####################################################################
 
 elif [ "$1" = "docker" ] ; then
 
-echo "Procédure de récupération en cours ..."
-
 ########################### Docker Engine ###########################
+
 echo " Préparation à l'installation de docker ..."
 sleep 2
 apt-get update
@@ -148,6 +156,7 @@ sleep 2
 apt-get install -y docker-ce docker-ce-cli containerd.io
 
 ########################## DOCKER-COMPOSE ###########################
+
 echo " Installation de docker-Compose ..."
 sleep 2
 curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -156,16 +165,24 @@ chmod +x /usr/local/bin/docker-compose
 
 docker-compose --version
 sleep 5
+####################### Installation de FTP #########################
 
+apt-get install ftp
+
+#####################################################################
 ########################### Restauration ############################
+#####################################################################
 
 elif [ "$1" = "rest" ] ; then
 
 ################### Restauration des Images Docker ##################
+
 cd /
+pwd
 cd $BACKUP
+pwd
 rest_ftp
-DOCKER_COMPOSE up -d
+docker-compose up -d
 
 ################## Restauration de la BDD MariaDB ###################
 
