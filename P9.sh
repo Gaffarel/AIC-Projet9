@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.19      ##
+##     Script de sauvegarde et restauration wordpresss  V0.20      ##
 ##                                                                 ##
 #####################################################################
 
@@ -46,6 +46,7 @@ fi
 
 function save_ftp
 {
+cd /
 cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
@@ -62,6 +63,7 @@ FTP_CONNEX
 
 function rest_ftp
 {
+cd /
 cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
@@ -72,6 +74,7 @@ cd $BACKUP
      get docker-compose.yml
      get .env
      get P9_config.ini
+     ls save_*.tar.bz2 save_liste.txt
      quit
 FTP_CONNEX
 }
@@ -79,14 +82,20 @@ FTP_CONNEX
 ####################### Test argument null ##########################
 
 if [[ $# -eq 0 ]] ; then
-    echo 'Manque un argument P9.sh save ou P9.sh rest'
+    echo 'Manque un argument save / rest / docker '
+    echo 'Pour sauvegarder votre serveur Wordpress et la BDD MariaDB: P9.sh save '
+    echo 'Pour installer DOCKER: P9.sh docker '
+    echo 'Pour restaurer votre serveur Wordpress: P9.sh rest '
     exit 1
 fi
 
 ##################### test argument rest ou save ####################
 
-if  [ "$1" != "rest" ] && [ "$1" != "save" ] ; then
+if  [ "$1" != "rest" ] && [ "$1" != "save" ] && [ "$1" != "docker" ] ; then
     echo 'Mauvais argument !'
+    echo 'Pour sauvegarder votre serveur Wordpress et la BDD MariaDB: P9.sh save '
+    echo 'Pour installer DOCKER: P9.sh docker '
+    echo 'Pour restaurer votre serveur Wordpress: P9.sh rest '
     exit 1
 fi
 
@@ -112,7 +121,7 @@ if [ "$1" = "save" ] ; then
 
 ########################### Restauration ############################
 
-elif [ "$1" = "rest" ] ; then
+elif [ "$1" = "docker" ] ; then
 
 echo "Procédure de récupération en cours ..."
 
@@ -148,8 +157,12 @@ chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 sleep 5
 
-################### Restauration des Images Docker ##################
+########################### Restauration ############################
 
+elif [ "$1" = "rest" ] ; then
+
+################### Restauration des Images Docker ##################
+cd /
 cd $BACKUP
 rest_ftp
 DOCKER_COMPOSE up -d
