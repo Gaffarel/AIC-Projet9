@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.18      ##
+##     Script de sauvegarde et restauration wordpresss  V0.19      ##
 ##                                                                 ##
 #####################################################################
 
@@ -79,7 +79,7 @@ FTP_CONNEX
 ####################### Test argument null ##########################
 
 if [[ $# -eq 0 ]] ; then
-    echo 'Manque un argument save ou rest'
+    echo 'Manque un argument P9.sh save ou P9.sh rest'
     exit 1
 fi
 
@@ -118,6 +118,7 @@ echo "Procédure de récupération en cours ..."
 
 ########################### Docker Engine ###########################
 echo " Préparation à l'installation de docker ..."
+sleep 2
 apt-get update
 apt-get install -y \
     apt-transport-https \
@@ -134,10 +135,12 @@ add-apt-repository \
 
 apt-get update
 echo " Installation de docker-Engine ..."
+sleep 2
 apt-get install -y docker-ce docker-ce-cli containerd.io
 
 ########################## DOCKER-COMPOSE ###########################
 echo " Installation de docker-Compose ..."
+sleep 2
 curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
 chmod +x /usr/local/bin/docker-compose
@@ -148,18 +151,17 @@ sleep 5
 ################### Restauration des Images Docker ##################
 
 cd $BACKUP
-
 rest_ftp
-
 DOCKER_COMPOSE up -d
 
-#### Restauration des Volumes Docker et des paramètres du réseau ####
+################## Restauration de la BDD MariaDB ###################
 
 CONTAINER
-echo "  Restauration de la BDD MariaDB ..."
+echo "Restauration de la BDD MariaDB ..."
 cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
 
-########## Restauration des fichier docker et de la BDD ############
+
+#### Restauration des Volumes Wordpress et des paramètres du réseau ####
 
 echo "Restauration des Volumes Docker et des paramètres du réseau ......";
 tar xvpjf save_$BACKUPDATE.tar.bz2 -C /
