@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.21a     ##
+##     Script de sauvegarde et restauration wordpresss  V0.21b     ##
 ##                                                                 ##
 #####################################################################
 
@@ -79,9 +79,10 @@ FTP_CONNEX
 function rest_ftp2
 {
 cd $BACKUP
-   ftp -p $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
+   ftp $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
+     bin
      cd sauvegarde
      get save_$BACKUPDATE.tar.bz2
      get docker-compose.yml
