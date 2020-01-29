@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.21b     ##
+##     Script de sauvegarde et restauration wordpresss  V0.22      ##
 ##                                                                 ##
 #####################################################################
 
@@ -15,7 +15,7 @@ FTP="/usr/bin/ftp"
 
 #################### Fichier de configuration #######################
 
-source P9_config.ini
+source /home/backup/P9_config.ini
 
 ########################## les variables ############################
 
@@ -76,21 +76,6 @@ cd $BACKUP
 FTP_CONNEX
 }
 
-function rest_ftp2
-{
-cd $BACKUP
-   ftp $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
-     quote USER $USER_FTP
-     quote PASS $MDP_FTP
-     bin
-     cd sauvegarde
-     get save_$BACKUPDATE.tar.bz2
-     get docker-compose.yml
-     ls save_*.tar.bz2 save_liste.txt
-     quit
-FTP_CONNEX
-}
-
 ####################### Test argument null ##########################
 
 if [[ $# -eq 0 ]] ; then
@@ -120,17 +105,15 @@ if [ "$1" = "save" ] ; then
 	echo "Sauvegarde en cours ..."
     echo " Sauvegarde de la BDD MariaDB ...";
     sleep 2
-    cd $BACKUP
-    $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > db_$BACKUPDATE.sql
+    $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > $BACKUP/db_$BACKUPDATE.sql
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
-    cd /
-    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/backup_wp/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ home/backup/log/ home/backup/docker-compose.yml home/backup/db_$BACKUPDATE.sql
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 /var/lib/docker/volumes/backup_wp/ /etc/network/interfaces /etc/resolv.conf /etc/hosts /etc/hostname /var/spool/cron/crontabs/ /var/log/ $BACKUP/log/ $BACKUP/docker-compose.yml $BACKUP/db_$BACKUPDATE.sql
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     save_ftp
-    rm -f db_$BACKUPDATE.sql
-    rm -f save_$BACKUPDATE.tar.bz2
+    rm -f $BACKUP/db_$BACKUPDATE.sql
+    rm -f $BACKUP/save_$BACKUPDATE.tar.bz2
 
 #####################################################################
 ##################### Installation de DOCKER ########################
@@ -180,7 +163,7 @@ elif [ "$1" = "rest" ] ; then
 
 ################### Restauration des Images Docker ##################
 
-rest_ftp2
+rest_ftp
 docker-compose up -d
 sleep 2
 #### Restauration des Volumes Wordpress et des paramètres du réseau ####
