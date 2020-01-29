@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.22      ##
+##     Script de sauvegarde et restauration wordpresss  V0.23      ##
 ##                                                                 ##
 #####################################################################
 
@@ -11,6 +11,7 @@
 
 DOCKER="/usr/bin/docker"
 TAR="/usr/bin/tar"
+CAT="/usr/bin/cat"
 FTP="/usr/bin/ftp"
 
 #################### Fichier de configuration #######################
@@ -175,7 +176,7 @@ sleep 2
 
 CONTAINER
 echo "Restauration de la BDD MariaDB ..."
-cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
+$CAT db_$BACKUPDATE.sql | $DOCKER exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
 sleep 5
 reboot
 
