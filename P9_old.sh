@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.21a     ##
+##     Script de sauvegarde et restauration wordpresss  V0.15a     ##
 ##                                                                 ##
 #####################################################################
 
@@ -10,20 +10,31 @@
 #################### Emplacement des programmes #####################
 
 DOCKER="/usr/bin/docker"
+DOCKER_COMPOSE="/usr/local/bin/docker-compose"
 TAR="/usr/bin/tar"
 FTP="/usr/bin/ftp"
+#SSH="/usr/bin/ssh"
+#SCP="/usr/bin/scp"
 
 #################### Fichier de configuration #######################
 
-source P9_config.ini
+#source = P9_config.ini
 
 ########################## les variables ############################
 
+SERVEUR_FTP="192.168.0.2"
+USER_FTP="allouis"
+MDP_FTP="bob"
+PORT_FTP=21
+BACKUP='/home/backup'
 BACKUPDATE=$(date +%Y-%m-%d)
-BACKUPDATE_OLD=$(date +%Y-%m-%d --date="$NBjour days ago")
 [ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
 contenaire_wordpress=''
 contenaire_mariadb=''
+
+############################## SSH ##################################
+
+
 
 ########################### LES FONCTIONS ###########################
 
@@ -49,12 +60,11 @@ cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
+     pwd
      bin
      cd sauvegarde
-     delete save_$BACKUPDATE_OLD.tar.bz2
      put save_$BACKUPDATE.tar.bz2
      put docker-compose.yml
-     ls save_*.tar.bz2 save_liste.txt
      quit
 FTP_CONNEX
 }
@@ -65,27 +75,14 @@ cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
+     pwd
      bin
+     cd Projet9/AIC-Projet9
+     get P9.sh
+     cd /
      cd sauvegarde
      get save_$BACKUPDATE.tar.bz2
      get docker-compose.yml
-     get .env
-     get P9_config.ini
-     ls save_*.tar.bz2 save_liste.txt
-     quit
-FTP_CONNEX
-}
-
-function rest_ftp2
-{
-cd $BACKUP
-   ftp -p $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
-     quote USER $USER_FTP
-     quote PASS $MDP_FTP
-     cd sauvegarde
-     get save_$BACKUPDATE.tar.bz2
-     get docker-compose.yml
-     ls save_*.tar.bz2 save_liste.txt
      quit
 FTP_CONNEX
 }
@@ -93,26 +90,18 @@ FTP_CONNEX
 ####################### Test argument null ##########################
 
 if [[ $# -eq 0 ]] ; then
-    echo 'Manque un argument save / rest / docker '
-    echo 'Pour sauvegarder votre serveur Wordpress et la BDD MariaDB: P9.sh save '
-    echo 'Pour installer DOCKER: P9.sh docker '
-    echo 'Pour restaurer votre serveur Wordpress: P9.sh rest '
+    echo 'Manque un argument save ou rest'
     exit 1
 fi
 
 ##################### test argument rest ou save ####################
 
-if  [ "$1" != "rest" ] && [ "$1" != "save" ] && [ "$1" != "docker" ] ; then
+if  [ "$1" != "rest" ] && [ "$1" != "save" ] ; then
     echo 'Mauvais argument !'
-    echo 'Pour sauvegarder votre serveur Wordpress et la BDD MariaDB: P9.sh save '
-    echo 'Pour installer DOCKER: P9.sh docker '
-    echo 'Pour restaurer votre serveur Wordpress: P9.sh rest '
     exit 1
 fi
 
-#####################################################################
 ############################ Sauvegarde #############################
-#####################################################################
 
 if [ "$1" = "save" ] ; then
     CONTAINER
@@ -120,27 +109,26 @@ if [ "$1" = "save" ] ; then
     echo " Sauvegarde de la BDD MariaDB ...";
     sleep 2
     cd $BACKUP
-    $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > db_$BACKUPDATE.sql
+    $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u allouis --password=bob MyCompany > db_$BACKUPDATE.sql
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
     cd /
-    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/backup_wp/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ home/backup/log/ home/backup/docker-compose.yml home/backup/db_$BACKUPDATE.sql
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 var/lib/docker/volumes/ etc/network/interfaces etc/resolv.conf etc/hosts etc/hostname var/log/ home/backup/log/ home/backup/docker-compose.yml home/backup/db_$BACKUPDATE.sql
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     save_ftp
+
     rm -f db_$BACKUPDATE.sql
     rm -f save_$BACKUPDATE.tar.bz2
 
-#####################################################################
-##################### Installation de DOCKER ########################
-#####################################################################
+########################### Restauration ############################
 
-elif [ "$1" = "docker" ] ; then
+elif [ "$1" = "rest" ] ; then
+
+echo "Procédure de récupération en cours ..."
 
 ########################### Docker Engine ###########################
-
 echo " Préparation à l'installation de docker ..."
-sleep 2
 apt-get update
 apt-get install -y \
     apt-transport-https \
@@ -157,13 +145,10 @@ add-apt-repository \
 
 apt-get update
 echo " Installation de docker-Engine ..."
-sleep 2
 apt-get install -y docker-ce docker-ce-cli containerd.io
 
 ########################## DOCKER-COMPOSE ###########################
-
 echo " Installation de docker-Compose ..."
-sleep 2
 curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
 chmod +x /usr/local/bin/docker-compose
@@ -171,29 +156,24 @@ chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 sleep 5
 
-#####################################################################
-########################### Restauration ############################
-#####################################################################
-
-elif [ "$1" = "rest" ] ; then
-
 ################### Restauration des Images Docker ##################
 
-rest_ftp2
-docker-compose up -d
-sleep 2
-#### Restauration des Volumes Wordpress et des paramètres du réseau ####
+cd $BACKUP
+
+DOCKER_COMPOSE up -d
+DOCKER_COMPOSE stop
+
+#### Restauration des Volumes Docker et des paramètres du réseau ####
+
+CONTAINER
+echo "  Restauration de la BDD MariaDB ..."
+cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u allouis --password=bob MyCompany
+
+########## Restauration des fichier docker et de la BDD ############
 
 echo "Restauration des Volumes Docker et des paramètres du réseau ......";
 tar xvpjf save_$BACKUPDATE.tar.bz2 -C /
-sleep 2
-################## Restauration de la BDD MariaDB ###################
 
-CONTAINER
-echo "Restauration de la BDD MariaDB ..."
-cat db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
-sleep 5
-reboot
+DOCKER_COMPOSE start
 
 fi
-
