@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.27      ##
+##     Script de sauvegarde et restauration wordpresss  V0.30      ##
 ##                                                                 ##
 #####################################################################
 
@@ -25,6 +25,7 @@ BACKUPDATE_OLD=$(date +%Y-%m-%d --date="$NBjour days ago")
 [ ! -d $BACKUP ] && mkdir $BACKUP && chown 0.0 $BACKUP && chmod 600 $BACKUP
 contenaire_wordpress=''
 contenaire_mariadb=''
+choix=''
 
 ########################### LES FONCTIONS ###########################
 
@@ -84,17 +85,19 @@ if [[ $# -eq 0 ]] ; then
     echo 'Manque un argument save / rest / docker '
     echo 'Pour sauvegarder votre serveur Wordpress et la BDD MariaDB: P9.sh save '
     echo 'Pour installer DOCKER: P9.sh docker '
-    echo 'Pour restaurer votre serveur Wordpress: P9.sh rest '
+    echo 'Pour restaurer votre serveur Wordpress en entier: P9.sh rest '
+    echo 'Pour restaurer votre BDD à une date précise du serveur Wordpress: P9.sh rest_db '
     exit 1
 fi
 
 ##################### test argument rest ou save ####################
 
-if  [ "$1" != "rest" ] && [ "$1" != "save" ] && [ "$1" != "docker" ] ; then
+if  [ "$1" != "rest" ] && [ "$1" != "save" ] && [ "$1" != "docker" ] && [ "$1" != "rest_db" ] ; then
     echo 'Mauvais argument !'
     echo 'Pour sauvegarder votre serveur Wordpress et la BDD MariaDB: P9.sh save '
     echo 'Pour installer DOCKER: P9.sh docker '
     echo 'Pour restaurer votre serveur Wordpress: P9.sh rest '
+    echo 'Pour restaurer votre BDD à une date précise du serveur Wordpress: P9.sh rest_db '
     exit 1
 fi
 
@@ -104,7 +107,7 @@ fi
 
 if [ "$1" = "save" ] ; then
     CONTAINER
-	echo "Sauvegarde en cours ..."
+    echo "Sauvegarde en cours ..."
     echo " Sauvegarde de la BDD MariaDB ...";
     sleep 2
     $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > $BACKUP/db_$BACKUPDATE.sql
@@ -180,6 +183,17 @@ CONTAINER
 echo "Restauration de la BDD MariaDB ..."
 $CAT $BACKUP/db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
 sleep 5
+
 #reboot
+
+elif [ "$1" = "rest_db" ] ; then
+
+CONTAINER
+echo "Restauration de la BDD MariaDB ..."
+$CAT $BACKUP/db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
+sleep 5
+
+#reboot
+
 
 fi
