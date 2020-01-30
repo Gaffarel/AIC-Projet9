@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.23      ##
+##     Script de sauvegarde et restauration wordpresss  V0.24      ##
 ##                                                                 ##
 #####################################################################
 
@@ -46,7 +46,6 @@ fi
 
 function save_ftp
 {
-cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
@@ -54,6 +53,7 @@ cd $BACKUP
      cd sauvegarde
      delete save_$BACKUPDATE_OLD.tar.bz2
      put save_$BACKUPDATE.tar.bz2
+     put db_$BACKUPDATE.sql
      put docker-compose.yml
      ls save_*.tar.bz2 save_liste.txt
      quit
@@ -62,13 +62,13 @@ FTP_CONNEX
 
 function rest_ftp
 {
-cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
      bin
      cd sauvegarde
      get save_$BACKUPDATE.tar.bz2
+     get db_$BACKUPDATE.sql
      get docker-compose.yml
      get .env
      get P9_config.ini
@@ -109,7 +109,7 @@ if [ "$1" = "save" ] ; then
     $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > $BACKUP/db_$BACKUPDATE.sql
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
-    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 /var/lib/docker/volumes/backup_wp/ /etc/network/interfaces /etc/resolv.conf /etc/hosts /etc/hostname /var/spool/cron/crontabs/ /var/log/ $BACKUP/log/ $BACKUP/docker-compose.yml $BACKUP/db_$BACKUPDATE.sql
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 /var/lib/docker/volumes/backup_wp/ /etc/network/interfaces /etc/resolv.conf /etc/hosts /etc/hostname /var/spool/cron/crontabs/ /var/log/ $BACKUP/log/ $BACKUP/docker-compose.yml #$BACKUP/db_$BACKUPDATE.sql
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     save_ftp
@@ -165,20 +165,19 @@ elif [ "$1" = "rest" ] ; then
 ################### Restauration des Images Docker ##################
 
 rest_ftp
-docker-compose up -d
+$BACKUP/docker-compose up -d
 sleep 2
-#### Restauration des Volumes Wordpress et des paramètres du réseau ####
+## Restauration des Volumes Wordpress et des paramètres du réseau ###
 
 echo "Restauration des Volumes Docker et des paramètres du réseau ......";
-tar xvpjf save_$BACKUPDATE.tar.bz2 -C /
+$TAR xvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 -C /
 sleep 2
 ################## Restauration de la BDD MariaDB ###################
 
 CONTAINER
 echo "Restauration de la BDD MariaDB ..."
-$CAT db_$BACKUPDATE.sql | $DOCKER exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
+$CAT $BACKUP/db_$BACKUPDATE.sql | $DOCKER exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
 sleep 5
-reboot
+#reboot
 
 fi
-
