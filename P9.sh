@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.24      ##
+##     Script de sauvegarde et restauration wordpresss  V0.25      ##
 ##                                                                 ##
 #####################################################################
 
@@ -109,7 +109,7 @@ if [ "$1" = "save" ] ; then
     $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > $BACKUP/db_$BACKUPDATE.sql
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
-    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 /var/lib/docker/volumes/backup_wp/ /etc/network/interfaces /etc/resolv.conf /etc/hosts /etc/hostname /var/spool/cron/crontabs/ /var/log/ $BACKUP/log/ $BACKUP/docker-compose.yml #$BACKUP/db_$BACKUPDATE.sql
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 /var/lib/docker/volumes/backup_wp/ /etc/network/interfaces /etc/resolv.conf /etc/hosts /etc/hostname /var/spool/cron/crontabs/ /var/log/ $BACKUP/log/ $BACKUP/docker-compose.yml
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     save_ftp
@@ -165,7 +165,7 @@ elif [ "$1" = "rest" ] ; then
 ################### Restauration des Images Docker ##################
 
 rest_ftp
-$BACKUP/docker-compose up -d
+docker-compose up -d
 sleep 2
 ## Restauration des Volumes Wordpress et des paramètres du réseau ###
 
@@ -176,7 +176,7 @@ sleep 2
 
 CONTAINER
 echo "Restauration de la BDD MariaDB ..."
-$CAT $BACKUP/db_$BACKUPDATE.sql | $DOCKER exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
+$CAT $BACKUP/db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
 sleep 5
 #reboot
 
