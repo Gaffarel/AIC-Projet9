@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.26      ##
+##     Script de sauvegarde et restauration wordpresss  V0.27      ##
 ##                                                                 ##
 #####################################################################
 
@@ -46,6 +46,7 @@ fi
 
 function save_ftp
 {
+cd $BACKUP
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX
      quote USER $USER_FTP
      quote PASS $MDP_FTP
