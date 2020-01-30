@@ -177,7 +177,7 @@ sleep 2
 
 CONTAINER
 echo "Restauration de la BDD MariaDB ..."
-$CAT $BACKUP/db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD --password=$MDP_BDD MyCompany
+$CAT $BACKUP/db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
 sleep 5
 #reboot
 
