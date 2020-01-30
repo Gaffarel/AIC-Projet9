@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.25      ##
+##     Script de sauvegarde et restauration wordpresss  V0.26      ##
 ##                                                                 ##
 #####################################################################
 
@@ -154,7 +154,13 @@ curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compo
 chmod +x /usr/local/bin/docker-compose
 
 docker-compose --version
-sleep 5
+sleep 2
+
+################### Restauration des Images Docker ##################
+
+rest_ftp
+docker-compose up -d
+sleep 2
 
 #####################################################################
 ########################### Restauration ############################
@@ -162,11 +168,6 @@ sleep 5
 
 elif [ "$1" = "rest" ] ; then
 
-################### Restauration des Images Docker ##################
-
-rest_ftp
-docker-compose up -d
-sleep 2
 ## Restauration des Volumes Wordpress et des paramètres du réseau ###
 
 echo "Restauration des Volumes Docker et des paramètres du réseau ......";
