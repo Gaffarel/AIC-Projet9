@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V0.30      ##
+##     Script de sauvegarde et restauration wordpresss  V0.30a     ##
 ##                                                                 ##
 #####################################################################
 
@@ -54,6 +54,7 @@ cd $BACKUP
      bin
      cd sauvegarde
      delete save_$BACKUPDATE_OLD.tar.bz2
+     delete db_$BACKUPDATE_OLD.sql
      put save_$BACKUPDATE.tar.bz2
      put db_$BACKUPDATE.sql
      put docker-compose.yml
@@ -82,7 +83,7 @@ FTP_CONNEX
 ####################### Test argument null ##########################
 
 if [[ $# -eq 0 ]] ; then
-    echo 'Manque un argument save / rest / docker '
+    echo 'Manque un argument save / rest / rest-db / docker '
     echo 'Pour sauvegarder votre serveur Wordpress et la BDD MariaDB: P9.sh save '
     echo 'Pour installer DOCKER: P9.sh docker '
     echo 'Pour restaurer votre serveur Wordpress en entier: P9.sh rest '
@@ -113,7 +114,7 @@ if [ "$1" = "save" ] ; then
     $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > $BACKUP/db_$BACKUPDATE.sql
     echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
     sleep 2
-    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 /var/lib/docker/volumes/backup_wp/ /etc/network/interfaces /etc/resolv.conf /etc/hosts /etc/hostname /var/spool/cron/crontabs/ /var/log/ $BACKUP/log/ $BACKUP/docker-compose.yml
+    $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 /var/lib/docker/volumes/backup_wp/ /etc/network/interfaces /etc/resolv.conf /etc/hosts /etc/hostname /var/spool/cron/crontabs/ /var/log/ $BACKUP/log/ $BACKUP/docker-compose.yml $BACKUP/db_$BACKUPDATE.sql
     echo "   Transfert vers le serveur FTP ...";
     sleep 2
     save_ftp
@@ -194,6 +195,5 @@ $CAT $BACKUP/db_$BACKUPDATE.sql | docker exec -i $contenaire_mariadb /usr/bin/my
 sleep 5
 
 #reboot
-
 
 fi
