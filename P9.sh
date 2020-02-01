@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V1.0       ##
+##     Script de sauvegarde et restauration wordpresss  V1.0a      ##
 ##                                                                 ##
 #####################################################################
 
@@ -213,6 +213,8 @@ select choix in $(echo "$fic") ;
 	break;
 done
 
+choix_db="db_(echo "$choix" | cut -c6-15 ).sql"
+
 recup_ftp1
 
 ## Restauration des Volumes Wordpress et des paramètres du réseau ###
@@ -222,13 +224,10 @@ $TAR xvpjf $BACKUP/$choix -C /
 sleep 2
 ################## Restauration de la BDD MariaDB ###################
 
-#choix_db=$(db_$choix | cut -c3-11 )
-#ip=$(sudo ifconfig enp0s3 | grep 'inet 192.168.' | awk '{print $2}' | cut -c9-11)
-
 CONTAINER
 
 echo "Restauration de la BDD ok ..."
-$CAT $BACKUP/db_*.sql | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
+$CAT $BACKUP/$choix_db | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
 sleep 2
 
 #rm -f $BACKUP/db_*.sql
