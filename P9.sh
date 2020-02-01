@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V1.0c      ##
+##     Script de sauvegarde et restauration wordpresss  V1.0d      ##
 ##                                                                 ##
 #####################################################################
 
@@ -192,12 +192,14 @@ sleep 2
 
 elif [ "$1" = "rest" ] ; then
 
+############# Récupération de la liste des sauvegardes ##############
+
 list_ftp
 
-echo "Qual Sauvegarde voulez-vous restaurer ?"
+echo "Quelle Sauvegarde voulez-vous restaurer ?"
 fic=$( $CAT 'save_liste.txt' | awk '{print $9}')
 select choix in $(echo "$fic") ;
-	do echo "Mon choix est $choix :";
+	do echo "Mon choix est : $choix";
 	break;
 done
 
@@ -219,8 +221,8 @@ echo "Restauration de la BDD ... "
 sleep 2
 $CAT $BACKUP/$choix_db | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
 
-rm -f $BACKUP/db_*.sql
-rm -f $BACKUP/save_*.tar.bz2
+rm -f $BACKUP/$choix_db
+rm -f $BACKUP/$choix
 
 echo "Reboot dans 5 secondes ... "
 sleep 5
@@ -234,11 +236,13 @@ reboot
 
 elif [ "$1" = "rest_db" ] ; then
 
+############# Récupération de la liste des sauvegardes ##############
+
 list_ftp
 
 fic=$( $CAT 'save_liste.txt' | awk '{print $9}')
 select choix in $(echo "$fic") ;
-	do echo "Mon choix est $choix :";
+	do echo "Mon choix est : $choix";
 	break;
 done
 
@@ -246,12 +250,14 @@ choix_db="db_$(echo "$choix" | cut -c6-15 ).sql"
 
 recup_ftp
 
+################## Restauration de la BDD MariaDB ###################
+
 CONTAINER
 
 $CAT $BACKUP/$choix_db | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
 echo "Restauration de la BDD ok ..."
 
-rm -f $BACKUP/db_*.sql
-rm -f $BACKUP/save_*.tar.bz2
+rm -f $BACKUP/$choix_db
+rm -f $BACKUP/$choix
 
 fi
