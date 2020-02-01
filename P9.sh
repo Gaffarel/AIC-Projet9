@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V1.0b      ##
+##     Script de sauvegarde et restauration wordpresss  V1.0c      ##
 ##                                                                 ##
 #####################################################################
 
@@ -81,13 +81,12 @@ function list_ftp
 	quote PASS $MDP_FTP
 	bin
 	cd sauvegarde
-	ls db_*.sql save_db.txt
 	ls save_*.tar.bz2 save_liste.txt
 	quit
 FTP_CONNEX2
 }
 
-function recup_ftp1
+function recup_ftp
 {
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX3
 	quote USER $USER_FTP
@@ -95,26 +94,15 @@ function recup_ftp1
 	bin
 	cd sauvegarde
 	get $choix
+    get $choix_db
 	quit
 FTP_CONNEX3
-}
-
-function recup_ftp2
-{
-   ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX4
-	quote USER $USER_FTP
-	quote PASS $MDP_FTP
-	bin
-	cd sauvegarde
-	get $choix_db
-	quit
-FTP_CONNEX4
 }
 
 ####################### Test argument null ##########################
 
 if [[ $# -eq 0 ]] ; then
-    echo 'Manque un argument save / rest / docker '
+    echo 'Manque un argument save / rest / rest_db / docker '
     echo 'Pour sauvegarder votre serveur Wordpress et la BDD MariaDB: P9.sh save '
     echo 'Pour installer DOCKER: P9.sh docker '
     echo 'Pour restaurer votre serveur Wordpress en entier: P9.sh rest '
@@ -215,11 +203,12 @@ done
 
 choix_db="db_$(echo "$choix" | cut -c6-15 ).sql"
 
-recup_ftp1
+recup_ftp
 
 ## Restauration des Volumes Wordpress et des paramètres du réseau ###
 
 echo "Restauration des Volumes Docker et des paramètres du réseau ... "
+sleep 2
 $TAR xvpjf $BACKUP/$choix -C /
 
 ################## Restauration de la BDD MariaDB ###################
@@ -227,13 +216,14 @@ $TAR xvpjf $BACKUP/$choix -C /
 CONTAINER
 
 echo "Restauration de la BDD ... "
+sleep 2
 $CAT $BACKUP/$choix_db | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
 
 rm -f $BACKUP/db_*.sql
 rm -f $BACKUP/save_*.tar.bz2
 
-sleep 5
 echo "Reboot dans 5 secondes ... "
+sleep 5
 
 reboot
 
@@ -246,14 +236,15 @@ elif [ "$1" = "rest_db" ] ; then
 
 list_ftp
 
-echo "Restauration de la BDD MariaDB ..."
-fic=$( $CAT 'save_db.txt' | awk '{print $9}')
-select choix_db in $(echo "$fic") ;
-	do echo "Mon choix est $choix_db :";
+fic=$( $CAT 'save_liste.txt' | awk '{print $9}')
+select choix in $(echo "$fic") ;
+	do echo "Mon choix est $choix :";
 	break;
 done
 
-recup_ftp2
+choix_db="db_$(echo "$choix" | cut -c6-15 ).sql"
+
+recup_ftp
 
 CONTAINER
 
@@ -261,5 +252,6 @@ $CAT $BACKUP/$choix_db | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $U
 echo "Restauration de la BDD ok ..."
 
 rm -f $BACKUP/db_*.sql
+rm -f $BACKUP/save_*.tar.bz2
 
 fi
