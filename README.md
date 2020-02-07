@@ -1,6 +1,6 @@
 # Script de sauvegarde et de restauration d'un serveur Wordpress et MariaDB sous Docker
 
-## *Projet N°9 [AIC]*
+## <div align="center"> Projet N°9 [AIC] </div>
 
 * Etape N°1:  
 
