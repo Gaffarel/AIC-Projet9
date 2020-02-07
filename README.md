@@ -14,7 +14,7 @@ Récupérer ou créer le fichier P9_config.ini et le mettre dans /home/backup
 
 ## fichier de config de P9.sh
 
-SERVEUR_FTP="O.O.O.O"  
+SERVEUR_FTP="O.O.O.O"  #### adresse ip du serveur FTP
 USER_FTP="XXXXXX"  
 MDP_FTP="YYYYYY"  
 USER_BDD="ZZZZZZ"  
@@ -43,18 +43,18 @@ Récupérer le fichier docker-compose.yml et le mettre dans /home/backup
 
 ## PROCEDURE:
 
-### Pour sauvegarder votre serveur Wordpress et la Base De Donnée MariaDB:
+### Pour sauvegarder votre serveur Wordpress et sa Base De Donnée MariaDB:
 
 P9.sh save
 
-### Pour installer DOCKER-CE et DOCKER-COMPOSE:
+### Pour installer DOCKER-CE et DOCKER-COMPOSE et installer les images Wordpress et MariaDB:
 
 P9.sh docker
 
-### Pour restaurer votre serveur Wordpress:
+### Pour restaurer l'intégralite du serveur Wordpress à une date donnée:
 
 P9.sh rest
 
-### Pour restaurer uniquement votre base de donnée Mysql MariaDB:
+### Pour restaurer uniquement votre base de donnée Mysql MariaDB à une date donnée:
 
 P9.sh rest_db
