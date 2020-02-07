@@ -5,10 +5,10 @@
 ## Mise en place :
 
 dans mon projet le serveur FTP donne l'accès directement à un dossier où se trouve un repertoire sauvegarde  
-dans lequel se trouve les fichiers :  
+dans lequel les fichiers suivants sont copiés:  
 
-- docker-compose.yml
-- env
+-- docker-compose.yml  
+-- env  
 
 * Etape N°1:  
 
