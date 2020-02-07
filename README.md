@@ -2,9 +2,17 @@
 
 ## <div align="center"> Projet N°9 [AIC] </div>
 
+## Mise en place :
+
+dans mon projet le serveur FTP donne l'accès directement à un dossier où se trouve un repertoire sauvegarde  
+dans lequel se trouve les fichiers :  
+
+- docker-compose.yml
+- env
+
 * Etape N°1:  
 
-Créer le dossier backup dans /home
+Créer le dossier backup dans /home sous root
 
 MKDIR /HOME/BACKUP
 
@@ -19,6 +27,11 @@ Récupérer ou créer le fichier d'environnement .env et le mettre dans /home/ba
 * Etape N°4:
 
 Récupérer le fichier docker-compose.yml et le mettre dans /home/backup
+
+* Etape N°5:
+
+Installer le client FTP  
+apt-get install ftp  
 
 ## PROCEDURE:
 
