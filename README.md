@@ -1,21 +1,18 @@
-*******************************************************************************************
-*                                                                                         *
-* Script de sauvegarde et de restauration d'un serveur Wordpress avec MariaDB sous Docker *
-*                                                                                         *
-*                                Projet N°9 [AIC]                                         *
-*                                                                                         *
-*******************************************************************************************
-Etape N°1: 
+#Script de sauvegarde et de restauration d'un serveur Wordpress avec MariaDB sous Docker
+
+#Projet N°9 [AIC]
+
+*Etape N°1:  
 
 Créer le dossier backup dans /home
 
 MKDIR /HOME/BACKUP
 
-Etape N°2:
+*Etape N°2:
 
 Récupérer ou créer le fichier P9_config.ini et le mettre dans /home/backup
 
-#fichier de config de P9.sh
+## fichier de config de P9.sh
 
 SERVEUR_FTP="O.O.O.O"
 USER_FTP="XXXXXX"
@@ -26,11 +23,11 @@ PORT_FTP=21
 NBjour=30
 BACKUP='/home/backup'
 
-Etape N°3:
+*Etape N°3:
 
 Récupérer ou créer le fichier d'environnement .env et le mettre dans /home/backup
 
-#fichier de configuration pour docker-compose.yml
+## fichier de configuration pour docker-compose.yml
 
 DB_ROOT_PASSWORD=BBBBBB
 DB_DATABASE=MyCompany
@@ -40,7 +37,7 @@ WP_DB_USER=ZZZZZZ
 WP_DB_PASSWORD=AAAAAA
 WP_DB_NAME=MyCompany
 
-Etape N°4:
+*Etape N°4:
 
 Récupérer le fichier docker-compose.yml et le mettre dans /home/backup
 
