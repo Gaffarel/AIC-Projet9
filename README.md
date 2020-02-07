@@ -7,8 +7,8 @@
 dans mon projet le serveur FTP donne l'accès directement à un dossier où se trouve un repertoire sauvegarde  
 dans lequel les fichiers suivants sont copiés:  
 
--- docker-compose.yml  
--- env  
+--> docker-compose.yml  
+--> .env  
 
 * Etape N°1:  
 
@@ -18,17 +18,21 @@ MKDIR /HOME/BACKUP
 
 * Etape N°2:
 
-Récupérer ou créer le fichier P9_config.ini et le mettre dans /home/backup
+Récupérer ou créer le fichier P9.sh et le mettre dans /home/backup
 
 * Etape N°3:
 
-Récupérer ou créer le fichier d'environnement .env et le mettre dans /home/backup
+Récupérer ou créer le fichier P9_config.ini et le mettre dans /home/backup
 
 * Etape N°4:
 
-Récupérer le fichier docker-compose.yml et le mettre dans /home/backup
+Récupérer ou créer le fichier d'environnement .env et le mettre dans le repertoire sauvegarde du serveur FTP
 
 * Etape N°5:
+
+Récupérer le fichier docker-compose.yml et le mettre dans le repertoire sauvegarde du serveur FTP
+
+* Etape N°6:
 
 Installer le client FTP  
 apt-get install ftp  
