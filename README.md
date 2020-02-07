@@ -41,20 +41,20 @@ WP_DB_NAME=MyCompany
 
 Récupérer le fichier docker-compose.yml et le mettre dans /home/backup
 
-PROCEDURE:
+## PROCEDURE:
 
-Pour sauvegarder votre serveur Wordpress et la Base De Donnée MariaDB: 
+### Pour sauvegarder votre serveur Wordpress et la Base De Donnée MariaDB:
 
 P9.sh save
 
-Pour installer DOCKER-CE et DOCKER-COMPOSE: 
+### Pour installer DOCKER-CE et DOCKER-COMPOSE:
 
 P9.sh docker
 
-Pour restaurer votre serveur Wordpress: 
+### Pour restaurer votre serveur Wordpress:
 
 P9.sh rest
 
-Pour restaurer uniquement votre base de donnée Mysql MariaDB: 
+### Pour restaurer uniquement votre base de donnée Mysql MariaDB:
 
 P9.sh rest_db
