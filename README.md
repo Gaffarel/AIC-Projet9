@@ -1,6 +1,6 @@
 # <div align="center"> Script de sauvegarde et de restauration d'un serveur Wordpress et MariaDB sous Docker </div>
 
-# <div align="center"> <font color=red> Projet N°9 [AIC] </font></div>
+## <div align="center"><span style="color=red"> Projet N°9 [AIC] </span></div>
 
 * Etape N°1:  
 
