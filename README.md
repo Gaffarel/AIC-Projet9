@@ -14,7 +14,7 @@ Récupérer ou créer le fichier P9_config.ini et le mettre dans /home/backup
 
 ## fichier de config de P9.sh
 
-SERVEUR_FTP="O.O.O.O"  #### adresse ip du serveur FTP
+SERVEUR_FTP="O.O.O.O"   -> adresse ip du serveur FTP  
 USER_FTP="XXXXXX"  
 MDP_FTP="YYYYYY"  
 USER_BDD="ZZZZZZ"  
