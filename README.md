@@ -14,14 +14,14 @@ Récupérer ou créer le fichier P9_config.ini et le mettre dans /home/backup
 
 ## fichier de config de P9.sh
 
-| SERVEUR_FTP="O.O.O.O" | -> adresse ip du serveur FTP                           |  
-| USER_FTP="XXXXXX"     | -> utilisateur authorisé à ce connecter au serveur FTP |  
-| MDP_FTP="YYYYYY"      | -> Mot de passe de l'utilisateur FTP                   |  
-| USER_BDD="ZZZZZZ"     |                                                        |  
-| MDP_BDD="AAAAAA"      |                                                        |  
-| PORT_FTP=21           |                                                        |  
-| NBjour=30             |                                                        |  
-| BACKUP='/home/backup' |                                                        |  
+| SERVEUR_FTP="O.O.O.O" |: -> adresse ip du serveur FTP                           :|  
+| USER_FTP="XXXXXX"     |: -> utilisateur authorisé à ce connecter au serveur FTP :|  
+| MDP_FTP="YYYYYY"      |: -> Mot de passe de l'utilisateur FTP                   :|  
+| USER_BDD="ZZZZZZ"     |:                                                        :|  
+| MDP_BDD="AAAAAA"      |:                                                        :|  
+| PORT_FTP=21           |:                                                        :|  
+| NBjour=30             |:                                                        :|  
+| BACKUP='/home/backup' |:                                                        :|  
 
 * Etape N°3:
 
