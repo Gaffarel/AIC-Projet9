@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##     Script de sauvegarde et restauration wordpresss  V1.0d      ##
+##     Script de sauvegarde et restauration wordpresss  V1.0e      ##
 ##                                                                 ##
 #####################################################################
 
@@ -45,6 +45,8 @@ fi
 
 ########################### FONCTION FTP ############################
 
+### Suppression des anciennes sauvegardes et dépôts des nouvelles ###
+
 function save_ftp
 {
 cd $BACKUP
@@ -61,6 +63,8 @@ cd $BACKUP
 FTP_CONNEX
 }
 
+### Récupération des fichiers de configuration pour docker-compose ####
+
 function rest_ftp
 {
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX1
@@ -74,6 +78,8 @@ function rest_ftp
 FTP_CONNEX1
 }
 
+### Récupération de la liste des sauvegardes sans un fichier .TXT ###
+
 function list_ftp
 {
    ftp -i -n $SERVEUR_FTP $PORT_FTP <<FTP_CONNEX2
@@ -85,6 +91,8 @@ function list_ftp
 	quit
 FTP_CONNEX2
 }
+
+##### Récuperation de la sauvegarde sélectionnées dans la liste #####
 
 function recup_ftp
 {
@@ -110,7 +118,7 @@ if [[ $# -eq 0 ]] ; then
     exit 1
 fi
 
-##################### test argument rest ou save ####################
+############ Test argument rest / save / docker / res_db ############
 
 if  [ "$1" != "rest" ] && [ "$1" != "save" ] && [ "$1" != "docker" ] && [ "$1" != "rest_db" ] ; then
     echo 'Mauvais argument !'
@@ -127,16 +135,10 @@ fi
 
 if [ "$1" = "save" ] ; then
     CONTAINER
-    echo "Sauvegarde en cours ..."
-    echo " Sauvegarde de la BDD MariaDB ...";
-    sleep 2
     $DOCKER exec $contenaire_mariadb /usr/bin/mysqldump -u $USER_BDD --password=$MDP_BDD MyCompany > $BACKUP/db_$BACKUPDATE.sql
-    echo "  Sauvegarde des Volumes Docker et des paramètres du réseau ......";
-    sleep 2
     $TAR cvpjf $BACKUP/save_$BACKUPDATE.tar.bz2 /var/lib/docker/volumes/backup_wp/ /etc/network/interfaces /etc/resolv.conf /etc/hosts /etc/hostname /var/spool/cron/crontabs/ /var/log/ $BACKUP/log/ $BACKUP/docker-compose.yml
-    echo "   Transfert vers le serveur FTP ...";
-    sleep 2
     save_ftp
+################## Suppression des fichiers créer ###################
     rm -f $BACKUP/db_$BACKUPDATE.sql
     rm -f $BACKUP/save_$BACKUPDATE.tar.bz2
 
@@ -196,6 +198,8 @@ elif [ "$1" = "rest" ] ; then
 
 list_ftp
 
+################ Liste de selection des sauvegardes #################
+
 echo "Quelle Sauvegarde voulez-vous restaurer ?"
 fic=$( $CAT 'save_liste.txt' | awk '{print $9}')
 select choix in $(echo "$fic") ;
@@ -220,7 +224,7 @@ CONTAINER
 echo "Restauration de la BDD ... "
 sleep 2
 $CAT $BACKUP/$choix_db | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
-
+################## Suppression des fichiers créer ###################
 rm -f $BACKUP/$choix_db
 rm -f $BACKUP/$choix
 
@@ -240,6 +244,8 @@ elif [ "$1" = "rest_db" ] ; then
 
 list_ftp
 
+################ Liste de selection des sauvegardes #################
+
 fic=$( $CAT 'save_liste.txt' | awk '{print $9}')
 select choix in $(echo "$fic") ;
 	do echo "Mon choix est : $choix";
@@ -256,7 +262,7 @@ CONTAINER
 
 $CAT $BACKUP/$choix_db | docker exec -i $contenaire_mariadb /usr/bin/mysql -u $USER_BDD -p$MDP_BDD MyCompany
 echo "Restauration de la BDD ok ..."
-
+################## Suppression des fichiers créer ###################
 rm -f $BACKUP/$choix_db
 rm -f $BACKUP/$choix
 
